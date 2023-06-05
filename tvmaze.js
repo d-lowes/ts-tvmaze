@@ -12531,10 +12531,6 @@ return jQuery;
 
 "use strict";
 
-var __makeTemplateObject = (this && this.__makeTemplateObject) || function (cooked, raw) {
-    if (Object.defineProperty) { Object.defineProperty(cooked, "raw", { value: raw }); } else { cooked.raw = raw; }
-    return cooked;
-};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -12576,8 +12572,9 @@ var axios_1 = __webpack_require__(/*! axios */ "./node_modules/axios/index.js");
 var $ = __webpack_require__(/*! jquery */ "./node_modules/jquery/dist/jquery.js");
 var $showsList = $('#showsList');
 var $episodesArea = $('#episodesArea');
+var $episodesList = $('#episodesList');
 var $searchForm = $('#searchForm');
-var BASE_URL = 'http://api.tvmaze.com';
+var BASE_API_URL = 'http://api.tvmaze.com';
 var DOGE_IMG = 'https://thedrum-media.imgix.net/thedrum-prod/s3/news/tmp/637022/shiba1.png?w=608&ar=default&fit=crop&crop=faces,edges&auto=format&dpr=1';
 /** Given a search term, search for tv shows that match that query.
  *
@@ -12590,7 +12587,7 @@ function getShowsByTerm(term) {
         var tvShowsRequest;
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0: return [4 /*yield*/, axios_1.default.get("".concat(BASE_URL, "/search/shows"), {
+                case 0: return [4 /*yield*/, axios_1.default.get("".concat(BASE_API_URL, "/search/shows"), {
                         params: {
                             q: term
                         }
@@ -12617,7 +12614,7 @@ function populateShows(shows) {
     $showsList.empty();
     for (var _i = 0, shows_1 = shows; _i < shows_1.length; _i++) {
         var show = shows_1[_i];
-        var $show = $("<div data-show-id=\"".concat(show.id, "\" class=\"Show col-md-12 col-lg-6 mb-4\">\n         <div class=\"media\">\n               <img src=\"").concat(show.image, "\" alt=\"").concat(show.name, "\" \n             class=\"w-25 me-3\">\n           <div class=\"media-body\">\n             <h5 class=\"text-primary\">").concat(show.name, "</h5>\n             <div><small>").concat(show.summary, "</small></div>\n             <button class=\"btn btn-outline-light btn-sm Show-getEpisodes\">\n               Episodes\n             </button>\n           </div>\n         </div>\n       </div>\n      "));
+        var $show = $("<div data-show-id=\"".concat(show.id, "\" class=\"Show col-md-12 col-lg-6 mb-4\">\n         <div class=\"media\">\n               <img src=\"").concat(show.image, "\" alt=\"").concat(show.name, "\"\n             class=\"w-25 me-3\">\n           <div class=\"media-body\">\n             <h5 class=\"text-primary\">").concat(show.name, "</h5>\n             <div><small>").concat(show.summary, "</small></div>\n             <button class=\"btn btn-outline-light btn-sm Show-getEpisodes\">\n               Episodes\n             </button>\n           </div>\n         </div>\n       </div>\n      "));
         $showsList.append($show);
     }
 }
@@ -12641,6 +12638,7 @@ function searchForShowAndDisplay() {
         });
     });
 }
+/** Event Listener for show search bar*/
 $searchForm.on('submit', function (evt) {
     return __awaiter(this, void 0, void 0, function () {
         return __generator(this, function (_a) {
@@ -12662,19 +12660,52 @@ function getEpisodesOfShow(id) {
     return __awaiter(this, void 0, void 0, function () {
         var episodes;
         return __generator(this, function (_a) {
-            episodes = axios_1.default.get(templateObject_1 || (templateObject_1 = __makeTemplateObject(["http://api.tvmaze.com/shows/", "/episodes"], ["http://api.tvmaze.com/shows/", "/episodes"])), id);
-            return [2 /*return*/, episodes.map(function (episode) { return ({
-                    id: episode.id,
-                    name: episode.name,
-                    season: episode.season,
-                    number: episode.number
-                }); })];
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, axios_1.default.get("".concat(BASE_API_URL, "/shows/").concat(id, "/episodes"))];
+                case 1:
+                    episodes = _a.sent();
+                    return [2 /*return*/, episodes.data.map(function (episode) { return ({
+                            id: episode.id,
+                            name: episode.name,
+                            season: episode.season,
+                            number: episode.number
+                        }); })];
+            }
         });
     });
 }
-/** Write a clear docstring for this function... */
-function populateEpisodes(episodes) { }
-var templateObject_1;
+/** populateEpisodes - Appends episode <li> to DOM & displays episodeArea
+ *
+ * Accepts:
+ * - Array of episodeInterface objects
+ */
+function populateEpisodes(episodes) {
+    $episodesList.empty();
+    for (var _i = 0, episodes_1 = episodes; _i < episodes_1.length; _i++) {
+        var episode = episodes_1[_i];
+        var $episode = $("<li>\n         ".concat(episode.name, "\n         (season ").concat(episode.season, ", episode ").concat(episode.number, ")\n       </li>\n      "));
+        $episodesList.append($episode);
+    }
+    $episodesArea.show();
+}
+/** Handle click on episodes button: get episodes for show and display */
+function retrieveEpisodesAndDisplay(evt) {
+    return __awaiter(this, void 0, void 0, function () {
+        var showId, episodes;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    showId = Number($(evt.target).closest('.Show').data('show-id'));
+                    return [4 /*yield*/, getEpisodesOfShow(showId)];
+                case 1:
+                    episodes = _a.sent();
+                    populateEpisodes(episodes);
+                    return [2 /*return*/];
+            }
+        });
+    });
+}
+$showsList.on('click', '.Show-getEpisodes', retrieveEpisodesAndDisplay);
 
 
 /***/ })
