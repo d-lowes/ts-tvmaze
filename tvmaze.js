@@ -12531,6 +12531,10 @@ return jQuery;
 
 "use strict";
 
+var __makeTemplateObject = (this && this.__makeTemplateObject) || function (cooked, raw) {
+    if (Object.defineProperty) { Object.defineProperty(cooked, "raw", { value: raw }); } else { cooked.raw = raw; }
+    return cooked;
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -12570,11 +12574,11 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 var axios_1 = __webpack_require__(/*! axios */ "./node_modules/axios/index.js");
 var $ = __webpack_require__(/*! jquery */ "./node_modules/jquery/dist/jquery.js");
-var $showsList = $("#showsList");
-var $episodesArea = $("#episodesArea");
-var $searchForm = $("#searchForm");
-var BASE_URL = "http://api.tvmaze.com";
-var DOGE_IMG = "https://thedrum-media.imgix.net/thedrum-prod/s3/news/tmp/637022/shiba1.png?w=608&ar=default&fit=crop&crop=faces,edges&auto=format&dpr=1";
+var $showsList = $('#showsList');
+var $episodesArea = $('#episodesArea');
+var $searchForm = $('#searchForm');
+var BASE_URL = 'http://api.tvmaze.com';
+var DOGE_IMG = 'https://thedrum-media.imgix.net/thedrum-prod/s3/news/tmp/637022/shiba1.png?w=608&ar=default&fit=crop&crop=faces,edges&auto=format&dpr=1';
 /** Given a search term, search for tv shows that match that query.
  *
  *  Returns (promise) array of show objects: [show, show, ...].
@@ -12613,7 +12617,7 @@ function populateShows(shows) {
     $showsList.empty();
     for (var _i = 0, shows_1 = shows; _i < shows_1.length; _i++) {
         var show = shows_1[_i];
-        var $show = $("<div data-show-id=\"".concat(show.id, "\" class=\"Show col-md-12 col-lg-6 mb-4\">\n         <div class=\"media\">\n           <img\n              src=\"http://static.tvmaze.com/uploads/images/medium_portrait/160/401704.jpg\"\n              alt=\"Bletchly Circle San Francisco\"\n              class=\"w-25 me-3\">\n           <div class=\"media-body\">\n             <h5 class=\"text-primary\">").concat(show.name, "</h5>\n             <div><small>").concat(show.summary, "</small></div>\n             <button class=\"btn btn-outline-light btn-sm Show-getEpisodes\">\n               Episodes\n             </button>\n           </div>\n         </div>\n       </div>\n      "));
+        var $show = $("<div data-show-id=\"".concat(show.id, "\" class=\"Show col-md-12 col-lg-6 mb-4\">\n         <div class=\"media\">\n               <img src=\"").concat(show.image, "\" alt=\"").concat(show.name, "\" \n             class=\"w-25 me-3\">\n           <div class=\"media-body\">\n             <h5 class=\"text-primary\">").concat(show.name, "</h5>\n             <div><small>").concat(show.summary, "</small></div>\n             <button class=\"btn btn-outline-light btn-sm Show-getEpisodes\">\n               Episodes\n             </button>\n           </div>\n         </div>\n       </div>\n      "));
         $showsList.append($show);
     }
 }
@@ -12626,7 +12630,7 @@ function searchForShowAndDisplay() {
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    term = $("#searchForm-term").val();
+                    term = $('#searchForm-term').val();
                     return [4 /*yield*/, getShowsByTerm(term)];
                 case 1:
                     shows = _a.sent();
@@ -12637,7 +12641,7 @@ function searchForShowAndDisplay() {
         });
     });
 }
-$searchForm.on("submit", function (evt) {
+$searchForm.on('submit', function (evt) {
     return __awaiter(this, void 0, void 0, function () {
         return __generator(this, function (_a) {
             switch (_a.label) {
@@ -12654,9 +12658,23 @@ $searchForm.on("submit", function (evt) {
 /** Given a show ID, get from API and return (promise) array of episodes:
  *      { id, name, season, number }
  */
-// async function getEpisodesOfShow(id) { }
+function getEpisodesOfShow(id) {
+    return __awaiter(this, void 0, void 0, function () {
+        var episodes;
+        return __generator(this, function (_a) {
+            episodes = axios_1.default.get(templateObject_1 || (templateObject_1 = __makeTemplateObject(["http://api.tvmaze.com/shows/", "/episodes"], ["http://api.tvmaze.com/shows/", "/episodes"])), id);
+            return [2 /*return*/, episodes.map(function (episode) { return ({
+                    id: episode.id,
+                    name: episode.name,
+                    season: episode.season,
+                    number: episode.number
+                }); })];
+        });
+    });
+}
 /** Write a clear docstring for this function... */
-// function populateEpisodes(episodes) { }
+function populateEpisodes(episodes) { }
+var templateObject_1;
 
 
 /***/ })
